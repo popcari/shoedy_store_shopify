@@ -1,0 +1,7 @@
+api_version = "2026-04"
+
+[[extensions]]
+uid = "bcbca75a-4dd7-54cc-8b94-62cbb1ed80bc4c06703c"
+type = "theme"
+name = "Cookie Consent Banner"
+handle = "cookie-banner"
