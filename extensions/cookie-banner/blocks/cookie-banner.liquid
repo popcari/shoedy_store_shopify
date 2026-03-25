@@ -213,9 +213,9 @@
   </div>
 
   <div class="cb-actions">
-    <button id="cb-decline" class="cb-btn cb-btn--decline">{{ block.settings.decline_text }}</button>
+    <button id="cb-declineAll" class="cb-btn cb-btn--decline">{{ block.settings.decline_text }}</button>
     <button id="cb-save" class="cb-btn cb-btn--save">Save Preferences</button>
-    <button id="cb-accept" class="cb-btn cb-btn--accept">{{ block.settings.accept_text }}</button>
+    <button id="cb-acceptAll" class="cb-btn cb-btn--accept">{{ block.settings.accept_text }}</button>
   </div>
 </div>
 
@@ -223,18 +223,19 @@
 
 <script>
   (function () {
-    var $ = document.getElementById.bind(document);
-    var banner = $('cb-banner'),
+    const $ = document.getElementById.bind(document);
+    const banner = $('cb-banner'),
       overlay = $('cb-overlay'),
       reopenBtn = $('cb-reopen');
     if (!banner) return;
 
-    var TYPES = ['analytics', 'marketing', 'preferences', 'sale_of_data'];
+    const TYPES = ['analytics', 'marketing', 'preferences'];
+    const saleOfDataRow = $('cb-sale-of-data-row');
 
     // Toggle visual helper
     function setToggle(input, on) {
       input.checked = on;
-      var sw = input.closest('.cb-switch');
+      const sw = input.closest('.cb-switch');
       if (!sw) return;
       sw.querySelector('.cb-track').style.background = on ? '#10b981' : '#d1d5db';
       sw.querySelector('.cb-thumb').style.left = on ? '23px' : '3px';
@@ -265,25 +266,27 @@
 
     // === Shopify Customer Privacy API ===
     function init() {
-      var p = window.Shopify.customerPrivacy;
+      const _customerPrivacy = window.Shopify.customerPrivacy;
 
       // Show sale_of_data toggle only in applicable regions
-      if (typeof p.saleOfDataRegion === 'function' && p.saleOfDataRegion()) {
+      if (typeof _customerPrivacy.saleOfDataRegion === 'function' && _customerPrivacy.saleOfDataRegion()) {
         $('cb-sale-of-data-row').style.display = 'flex';
       }
 
       function restoreToggles() {
         try {
-          var c = p.currentVisitorConsent();
-          TYPES.forEach(function (t) {
-            var inp = banner.querySelector("[data-cookie-type='" + t + "']");
-            if (inp && c[t] !== undefined && c[t] !== '') setToggle(inp, c[t] === 'yes' || c[t] === true);
+          const consent = _customerPrivacy.currentVisitorConsent();
+          const types = saleOfDataRow.style.display !== 'none' ? TYPES.concat('sale_of_data') : TYPES;
+          types.forEach(function (t) {
+            const inp = banner.querySelector("[data-cookie-type='" + t + "']");
+            if (inp && consent[t] !== undefined && consent[t] !== '')
+              setToggle(inp, consent[t] === 'yes' || consent[t] === true);
           });
         } catch (e) {}
       }
 
       function apply(obj) {
-        p.setTrackingConsent(obj, function () {
+        _customerPrivacy.setTrackingConsent(obj, function () {
           console.log('[Cookie Banner] Consent:', obj);
         });
       }
@@ -292,25 +295,26 @@
         banner.querySelectorAll('.cb-switch input').forEach(function (inp) {
           setToggle(inp, val);
         });
-        var obj = {};
+        const obj = {};
         TYPES.forEach(function (t) {
           obj[t] = val;
         });
+        if (saleOfDataRow.style.display !== 'none') obj.sale_of_data = val;
         apply(obj);
         hideBanner();
       }
 
-      $('cb-accept').addEventListener('click', function () {
+      $('cb-acceptAll').addEventListener('click', function () {
         setAll(true);
       });
-      $('cb-decline').addEventListener('click', function () {
+      $('cb-declineAll').addEventListener('click', function () {
         setAll(false);
       });
 
       $('cb-save').addEventListener('click', function () {
-        var obj = {};
+        const obj = {};
         banner.querySelectorAll('[data-cookie-type]').forEach(function (inp) {
-          var t = inp.getAttribute('data-cookie-type');
+          const t = inp.getAttribute('data-cookie-type');
           if (t !== 'essential') obj[t] = inp.checked;
         });
         apply(obj);
@@ -322,7 +326,7 @@
         showBanner();
       });
       overlay.addEventListener('click', function () {
-        if (!p.shouldShowBanner()) hideBanner();
+        if (!_customerPrivacy.shouldShowBanner()) hideBanner();
       });
 
       // Hover effects
@@ -334,8 +338,8 @@
         this.style.transform = 'scale(1)';
         this.style.boxShadow = '0 4px 16px rgba(0,0,0,.15)';
       });
-      ['cb-accept', 'cb-decline', 'cb-save'].forEach(function (id) {
-        var b = $(id);
+      ['cb-acceptAll', 'cb-declineAll', 'cb-save'].forEach(function (id) {
+        const b = $(id);
         if (b) {
           b.addEventListener('mouseenter', function () {
             this.style.opacity = '.85';
@@ -347,7 +351,7 @@
       });
 
       // Init visibility
-      if (p.shouldShowBanner()) setTimeout(showBanner, 800);
+      if (_customerPrivacy.shouldShowBanner()) setTimeout(showBanner, 800);
       else {
         reopenBtn.style.display = 'block';
         restoreToggles();
