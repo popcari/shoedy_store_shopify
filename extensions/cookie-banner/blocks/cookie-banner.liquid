@@ -1,301 +1,402 @@
-<div id="cb-overlay" style="
-  display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4);
-  z-index:99998; backdrop-filter:blur(2px); transition:opacity 0.3s;
-"></div>
+<style>
+  .cb-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 99998;
+    backdrop-filter: blur(2px);
+    transition: opacity 0.3s;
+  }
+  .cb-banner {
+    display: none;
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 99999;
+    width: calc(100% - 48px);
+    max-width: 520px;
+    background: rgba(255, 255, 255, 0.97);
+    backdrop-filter: blur(16px);
+    border-radius: 16px;
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.06);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    overflow: hidden;
+  }
+  .cb-header {
+    padding: 20px 24px 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .cb-header h3 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 700;
+    color: #111;
+  }
+  .cb-msg {
+    padding: 12px 24px 0;
+  }
+  .cb-msg p {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #555;
+  }
+  .cb-msg a {
+    color: #2563eb;
+    text-decoration: none;
+    font-weight: 500;
+  }
+  .cb-toggles {
+    padding: 16px 24px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .cb-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    background: #f8f9fa;
+    border-radius: 10px;
+  }
+  .cb-row--sale {
+    display: none;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+  }
+  .cb-row span {
+    font-size: 13px;
+    font-weight: 600;
+    color: #111;
+  }
+  .cb-row p {
+    margin: 2px 0 0;
+    font-size: 11px;
+    color: #888;
+  }
+  .cb-switch {
+    position: relative;
+    width: 44px;
+    height: 24px;
+    flex-shrink: 0;
+    cursor: pointer;
+  }
+  .cb-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+    position: absolute;
+  }
+  .cb-track {
+    position: absolute;
+    inset: 0;
+    background: #d1d5db;
+    border-radius: 24px;
+    transition: background 0.2s;
+  }
+  .cb-thumb {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 18px;
+    height: 18px;
+    background: #fff;
+    border-radius: 50%;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+    transition: left 0.2s;
+  }
+  .cb-actions {
+    padding: 16px 24px 20px;
+    display: flex;
+    gap: 8px;
+  }
+  .cb-btn {
+    flex: 1;
+    padding: 11px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.15s;
+    border: none;
+  }
+  .cb-btn--decline {
+    border: 1px solid #e5e7eb;
+    background: #fff;
+    color: #374151;
+  }
+  .cb-btn--save {
+    background: #374151;
+    color: #fff;
+  }
+  .cb-btn--accept {
+    background: #111;
+    color: #fff;
+  }
+  .cb-reopen {
+    display: none;
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    z-index: 99997;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: none;
+    background: #111;
+    color: #fff;
+    font-size: 22px;
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+</style>
 
-<div id="cb-banner" style="
-  display:none; position:fixed; bottom:24px; left:50%; transform:translateX(-50%);
-  z-index:99999; width:calc(100% - 48px); max-width:520px;
-  background:rgba(255,255,255,0.97); backdrop-filter:blur(16px);
-  border-radius:16px; box-shadow:0 8px 40px rgba(0,0,0,0.12), 0 0 0 1px rgba(0,0,0,0.06);
-  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
-  overflow:hidden;
-">
-  <!-- Header -->
-  <div style="padding:20px 24px 0; display:flex; align-items:center; gap:10px;">
-    <span style="font-size:24px;">🍪</span>
-    <h3 style="margin:0; font-size:16px; font-weight:700; color:#111;">{{ block.settings.title }}</h3>
+<div id="cb-overlay" class="cb-overlay"></div>
+
+<div id="cb-banner" class="cb-banner">
+  <div class="cb-header">
+    <span style="font-size:24px">🍪</span>
+    <h3>{{ block.settings.title }}</h3>
   </div>
 
-  <!-- Message -->
-  <div style="padding:12px 24px 0;">
-    <p style="margin:0; font-size:13px; line-height:1.6; color:#555;">
+  <div class="cb-msg">
+    <p>
       {{ block.settings.message }}
       {% if block.settings.privacy_url != blank %}
-        <a href="{{ block.settings.privacy_url }}" target="_blank" rel="noopener"
-           style="color:#2563eb; text-decoration:none; font-weight:500;">
-          {{ block.settings.privacy_link_text }}
+        <a href="{{ block.settings.privacy_url }}" target="_blank" rel="noopener">
+          {{- block.settings.privacy_link_text -}}
         </a>
       {% endif %}
     </p>
   </div>
 
-  <!-- Toggle Switches -->
-  <div id="cb-toggles" style="padding:16px 24px 0; display:flex; flex-direction:column; gap:10px;">
-    <!-- Essential -->
-    <div style="display:flex; align-items:center; justify-content:space-between; padding:10px 14px; background:#f8f9fa; border-radius:10px;">
-      <div>
-        <span style="font-size:13px; font-weight:600; color:#111;">🔒 Essential</span>
-        <p style="margin:2px 0 0; font-size:11px; color:#888;">Required for the site to function properly</p>
+  <div class="cb-toggles">
+    {%- assign toggles = 'essential,🔒,Required for the site to function properly|analytics,📊,Help us understand how visitors use our site|marketing,📢,Personalized ads and recommendations|preferences,⚙️,Remember your language region & personalization'
+      | split: '|'
+    -%}
+    {%- for toggle in toggles -%}
+      {%- assign parts = toggle | split: ',' -%}
+      <div class="cb-row">
+        <div>
+          <span>
+            {{- parts[1] }}
+            {{ parts[0] | capitalize -}}
+          </span>
+          <p>{{ parts[2] }}</p>
+        </div>
+        <label class="cb-switch">
+          <input type="checkbox" data-cookie-type="{{ parts[0] }}">
+          <span class="cb-track"></span>
+          <span class="cb-thumb"></span>
+        </label>
       </div>
-      <label class="cb-switch" style="position:relative; width:44px; height:24px; flex-shrink:0; cursor:pointer;">
-        <input type="checkbox" data-cookie-type="essential" style="opacity:0; width:0; height:0; position:absolute;">
-        <span class="cb-track" style="
-          position:absolute; inset:0; background:#d1d5db; border-radius:24px;
-          transition:background 0.2s;
-        "></span>
-        <span class="cb-thumb" style="
-          position:absolute; top:3px; left:3px; width:18px; height:18px;
-          background:#fff; border-radius:50%; box-shadow:0 1px 3px rgba(0,0,0,0.15);
-          transition:left 0.2s;
-        "></span>
-      </label>
-    </div>
+    {%- endfor -%}
 
-    <!-- Analytics -->
-    <div style="display:flex; align-items:center; justify-content:space-between; padding:10px 14px; background:#f8f9fa; border-radius:10px;">
+    <!-- Sale of Data (only shown in applicable regions) -->
+    <div id="cb-sale-of-data-row" class="cb-row cb-row--sale">
       <div>
-        <span style="font-size:13px; font-weight:600; color:#111;">📊 Analytics</span>
-        <p style="margin:2px 0 0; font-size:11px; color:#888;">Help us understand how visitors use our site</p>
+        <span>🛡️ Sale of Data</span>
+        <p>Allow sharing data with third parties</p>
       </div>
-      <label class="cb-switch" style="position:relative; width:44px; height:24px; flex-shrink:0; cursor:pointer;">
-        <input type="checkbox" data-cookie-type="analytics" style="opacity:0; width:0; height:0; position:absolute;">
-        <span class="cb-track" style="
-          position:absolute; inset:0; background:#d1d5db; border-radius:24px;
-          transition:background 0.2s;
-        "></span>
-        <span class="cb-thumb" style="
-          position:absolute; top:3px; left:3px; width:18px; height:18px;
-          background:#fff; border-radius:50%; box-shadow:0 1px 3px rgba(0,0,0,0.15);
-          transition:left 0.2s;
-        "></span>
-      </label>
-    </div>
-
-    <!-- Marketing -->
-    <div style="display:flex; align-items:center; justify-content:space-between; padding:10px 14px; background:#f8f9fa; border-radius:10px;">
-      <div>
-        <span style="font-size:13px; font-weight:600; color:#111;">📢 Marketing</span>
-        <p style="margin:2px 0 0; font-size:11px; color:#888;">Personalized ads and recommendations</p>
-      </div>
-      <label class="cb-switch" style="position:relative; width:44px; height:24px; flex-shrink:0; cursor:pointer;">
-        <input type="checkbox" data-cookie-type="marketing" style="opacity:0; width:0; height:0; position:absolute;">
-        <span class="cb-track" style="
-          position:absolute; inset:0; background:#d1d5db; border-radius:24px;
-          transition:background 0.2s;
-        "></span>
-        <span class="cb-thumb" style="
-          position:absolute; top:3px; left:3px; width:18px; height:18px;
-          background:#fff; border-radius:50%; box-shadow:0 1px 3px rgba(0,0,0,0.15);
-          transition:left 0.2s;
-        "></span>
+      <label class="cb-switch">
+        <input type="checkbox" data-cookie-type="sale_of_data" checked>
+        <span class="cb-track" style="background:#10b981"></span>
+        <span class="cb-thumb" style="left:23px"></span>
       </label>
     </div>
   </div>
 
-  <!-- Action Buttons -->
-  <div style="padding:16px 24px 20px; display:flex; gap:8px;">
-    <button id="cb-decline" style="
-      flex:1; padding:11px 16px; font-size:13px; font-weight:600;
-      border:1px solid #e5e7eb; background:#fff; color:#374151;
-      border-radius:10px; cursor:pointer; transition:all 0.15s;
-    ">{{ block.settings.decline_text }}</button>
-    <button id="cb-save" style="
-      flex:1; padding:11px 16px; font-size:13px; font-weight:600;
-      border:none; background:#374151; color:#fff;
-      border-radius:10px; cursor:pointer; transition:all 0.15s;
-    ">Save Preferences</button>
-    <button id="cb-accept" style="
-      flex:1; padding:11px 16px; font-size:13px; font-weight:600;
-      border:none; background:#111; color:#fff;
-      border-radius:10px; cursor:pointer; transition:all 0.15s;
-    ">{{ block.settings.accept_text }}</button>
+  <div class="cb-actions">
+    <button id="cb-decline" class="cb-btn cb-btn--decline">{{ block.settings.decline_text }}</button>
+    <button id="cb-save" class="cb-btn cb-btn--save">Save Preferences</button>
+    <button id="cb-accept" class="cb-btn cb-btn--accept">{{ block.settings.accept_text }}</button>
   </div>
 </div>
 
-<!-- Floating re-open button (appears after banner is dismissed) -->
-<button id="cb-reopen" style="
-  display:none; position:fixed; bottom:20px; left:20px; z-index:99997;
-  width:48px; height:48px; border-radius:50%; border:none;
-  background:#111; color:#fff; font-size:22px; cursor:pointer;
-  box-shadow:0 4px 16px rgba(0,0,0,0.15); transition:transform 0.2s, box-shadow 0.2s;
-" title="Cookie Settings">🍪</button>
+<button id="cb-reopen" class="cb-reopen" title="Cookie Settings">🍪</button>
 
-<script defer>
-document.addEventListener("DOMContentLoaded", function() {
-  var KEY = "cookie-prefs";
-  var banner = document.getElementById("cb-banner");
-  var overlay = document.getElementById("cb-overlay");
-  var reopenBtn = document.getElementById("cb-reopen");
-  if (!banner) return;
+<script>
+  (function () {
+    var $ = document.getElementById.bind(document);
+    var banner = $('cb-banner'),
+      overlay = $('cb-overlay'),
+      reopenBtn = $('cb-reopen');
+    if (!banner) return;
 
-  var switches = banner.querySelectorAll(".cb-switch");
+    var TYPES = ['analytics', 'marketing', 'preferences', 'sale_of_data'];
 
-  // Toggle switch visual
-  switches.forEach(function(sw) {
-    var input = sw.querySelector("input");
-    var track = sw.querySelector(".cb-track");
-    var thumb = sw.querySelector(".cb-thumb");
-    input.addEventListener("change", function() {
-      track.style.background = input.checked ? "#10b981" : "#d1d5db";
-      thumb.style.left = input.checked ? "23px" : "3px";
-    });
-  });
-
-  function getPrefs() {
-    try {
-      var d = JSON.parse(localStorage.getItem(KEY));
-      if (d && d.expiry && new Date().getTime() < d.expiry) return d;
-      localStorage.removeItem(KEY);
-    } catch(e) {}
-    return null;
-  }
-
-  function savePrefs(prefs) {
-    prefs.expiry = new Date().getTime() + 365 * 86400000;
-    localStorage.setItem(KEY, JSON.stringify(prefs));
-  }
-
-  function showBanner() {
-    banner.style.display = "block";
-    overlay.style.display = "block";
-    reopenBtn.style.display = "none";
-    setTimeout(function() {
-      banner.style.opacity = "1";
-      overlay.style.opacity = "1";
-    }, 10);
-  }
-
-  function hideBanner() {
-    banner.style.opacity = "0";
-    overlay.style.opacity = "0";
-    setTimeout(function() {
-      banner.style.display = "none";
-      overlay.style.display = "none";
-      reopenBtn.style.display = "block";
-    }, 300);
-  }
-
-  // Accept All
-  document.getElementById("cb-accept").addEventListener("click", function() {
-    switches.forEach(function(sw) {
-      var inp = sw.querySelector("input");
-      inp.checked = true;
-      sw.querySelector(".cb-track").style.background = "#10b981";
-      sw.querySelector(".cb-thumb").style.left = "23px";
-    });
-    savePrefs({ essential: true, analytics: true, marketing: true });
-    hideBanner();
-  });
-
-  // Decline All
-  document.getElementById("cb-decline").addEventListener("click", function() {
-    switches.forEach(function(sw) {
-      var inp = sw.querySelector("input");
-      inp.checked = false;
-      sw.querySelector(".cb-track").style.background = "#d1d5db";
-      sw.querySelector(".cb-thumb").style.left = "3px";
-    });
-    savePrefs({ essential: false, analytics: false, marketing: false });
-    hideBanner();
-  });
-
-  // Save Preferences
-  document.getElementById("cb-save").addEventListener("click", function() {
-    var prefs = {};
-    banner.querySelectorAll("[data-cookie-type]").forEach(function(inp) {
-      prefs[inp.getAttribute("data-cookie-type")] = inp.checked;
-    });
-    savePrefs(prefs);
-    hideBanner();
-  });
-
-  // Re-open
-  reopenBtn.addEventListener("click", showBanner);
-  overlay.addEventListener("click", function() {
-    if (getPrefs()) hideBanner();
-  });
-
-  // Hover effects
-  reopenBtn.addEventListener("mouseenter", function() {
-    this.style.transform = "scale(1.1)";
-    this.style.boxShadow = "0 6px 24px rgba(0,0,0,0.2)";
-  });
-  reopenBtn.addEventListener("mouseleave", function() {
-    this.style.transform = "scale(1)";
-    this.style.boxShadow = "0 4px 16px rgba(0,0,0,0.15)";
-  });
-
-  // Button hover effects
-  ["cb-accept","cb-decline","cb-save"].forEach(function(id) {
-    var btn = document.getElementById(id);
-    btn.addEventListener("mouseenter", function() { this.style.opacity = "0.85"; });
-    btn.addEventListener("mouseleave", function() { this.style.opacity = "1"; });
-  });
-
-  // Init
-  var existing = getPrefs();
-  if (existing) {
-    reopenBtn.style.display = "block";
-    // Restore toggle states
-    if (existing.analytics) {
-      var a = banner.querySelector("[data-cookie-type='analytics']");
-      if (a) { a.checked = true; a.closest(".cb-switch").querySelector(".cb-track").style.background = "#10b981"; a.closest(".cb-switch").querySelector(".cb-thumb").style.left = "23px"; }
+    // Toggle visual helper
+    function setToggle(input, on) {
+      input.checked = on;
+      var sw = input.closest('.cb-switch');
+      if (!sw) return;
+      sw.querySelector('.cb-track').style.background = on ? '#10b981' : '#d1d5db';
+      sw.querySelector('.cb-thumb').style.left = on ? '23px' : '3px';
     }
-    if (existing.marketing) {
-      var m = banner.querySelector("[data-cookie-type='marketing']");
-      if (m) { m.checked = true; m.closest(".cb-switch").querySelector(".cb-track").style.background = "#10b981"; m.closest(".cb-switch").querySelector(".cb-thumb").style.left = "23px"; }
+
+    // Bind all toggle change events
+    banner.querySelectorAll('.cb-switch input').forEach(function (inp) {
+      inp.addEventListener('change', function () {
+        setToggle(inp, inp.checked);
+      });
+    });
+
+    function showBanner() {
+      banner.style.display = overlay.style.display = 'block';
+      reopenBtn.style.display = 'none';
+      setTimeout(function () {
+        banner.style.opacity = overlay.style.opacity = '1';
+      }, 10);
     }
-  } else {
-    setTimeout(showBanner, 800);
-  }
-});
+
+    function hideBanner() {
+      banner.style.opacity = overlay.style.opacity = '0';
+      setTimeout(function () {
+        banner.style.display = overlay.style.display = 'none';
+        reopenBtn.style.display = 'block';
+      }, 300);
+    }
+
+    // === Shopify Customer Privacy API ===
+    function init() {
+      var p = window.Shopify.customerPrivacy;
+
+      // Show sale_of_data toggle only in applicable regions
+      if (typeof p.saleOfDataRegion === 'function' && p.saleOfDataRegion()) {
+        $('cb-sale-of-data-row').style.display = 'flex';
+      }
+
+      function restoreToggles() {
+        try {
+          var c = p.currentVisitorConsent();
+          TYPES.forEach(function (t) {
+            var inp = banner.querySelector("[data-cookie-type='" + t + "']");
+            if (inp && c[t] !== undefined && c[t] !== '') setToggle(inp, c[t] === 'yes' || c[t] === true);
+          });
+        } catch (e) {}
+      }
+
+      function apply(obj) {
+        p.setTrackingConsent(obj, function () {
+          console.log('[Cookie Banner] Consent:', obj);
+        });
+      }
+
+      function setAll(val) {
+        banner.querySelectorAll('.cb-switch input').forEach(function (inp) {
+          setToggle(inp, val);
+        });
+        var obj = {};
+        TYPES.forEach(function (t) {
+          obj[t] = val;
+        });
+        apply(obj);
+        hideBanner();
+      }
+
+      $('cb-accept').addEventListener('click', function () {
+        setAll(true);
+      });
+      $('cb-decline').addEventListener('click', function () {
+        setAll(false);
+      });
+
+      $('cb-save').addEventListener('click', function () {
+        var obj = {};
+        banner.querySelectorAll('[data-cookie-type]').forEach(function (inp) {
+          var t = inp.getAttribute('data-cookie-type');
+          if (t !== 'essential') obj[t] = inp.checked;
+        });
+        apply(obj);
+        hideBanner();
+      });
+
+      reopenBtn.addEventListener('click', function () {
+        restoreToggles();
+        showBanner();
+      });
+      overlay.addEventListener('click', function () {
+        if (!p.shouldShowBanner()) hideBanner();
+      });
+
+      // Hover effects
+      reopenBtn.addEventListener('mouseenter', function () {
+        this.style.transform = 'scale(1.1)';
+        this.style.boxShadow = '0 6px 24px rgba(0,0,0,.2)';
+      });
+      reopenBtn.addEventListener('mouseleave', function () {
+        this.style.transform = 'scale(1)';
+        this.style.boxShadow = '0 4px 16px rgba(0,0,0,.15)';
+      });
+      ['cb-accept', 'cb-decline', 'cb-save'].forEach(function (id) {
+        var b = $(id);
+        if (b) {
+          b.addEventListener('mouseenter', function () {
+            this.style.opacity = '.85';
+          });
+          b.addEventListener('mouseleave', function () {
+            this.style.opacity = '1';
+          });
+        }
+      });
+
+      // Init visibility
+      if (p.shouldShowBanner()) setTimeout(showBanner, 800);
+      else {
+        reopenBtn.style.display = 'block';
+        restoreToggles();
+      }
+
+      document.addEventListener('visitorConsentCollected', function (e) {
+        console.log('[Cookie Banner] visitorConsentCollected:', e.detail);
+      });
+    }
+
+    // Load API
+    function load() {
+      if (window.Shopify && window.Shopify.loadFeatures) {
+        window.Shopify.loadFeatures([{ name: 'consent-tracking-api', version: '0.1' }], function (err) {
+          if (err) {
+            console.error('[Cookie Banner] API load failed:', err);
+            return;
+          }
+          init();
+        });
+      } else {
+        setTimeout(function () {
+          if (window.Shopify && window.Shopify.loadFeatures) load();
+        }, 2000);
+      }
+    }
+
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', load);
+    else load();
+  })();
 </script>
 
 {% schema %}
 {
   "name": "Cookie Consent Banner",
   "target": "body",
-  "enabled_on": {
-    "templates": ["index"]
-  },
+  "enabled_on": { "templates": ["*"] },
   "settings": [
-    {
-      "type": "text",
-      "id": "title",
-      "label": "Banner Title",
-      "default": "Cookie Preferences"
-    },
+    { "type": "text", "id": "title", "label": "Banner Title", "default": "Cookie Preferences" },
     {
       "type": "textarea",
       "id": "message",
       "label": "Banner Message",
       "default": "We use cookies to enhance your browsing experience, serve personalized content, and analyze our traffic. Choose which cookies you'd like to allow."
     },
-    {
-      "type": "text",
-      "id": "privacy_url",
-      "label": "Privacy Policy URL",
-      "default": "/policies/privacy-policy"
-    },
-    {
-      "type": "text",
-      "id": "privacy_link_text",
-      "label": "Privacy Link Text",
-      "default": "Learn more →"
-    },
-    {
-      "type": "text",
-      "id": "accept_text",
-      "label": "Accept All Text",
-      "default": "Accept All"
-    },
-    {
-      "type": "text",
-      "id": "decline_text",
-      "label": "Decline Text",
-      "default": "Decline"
-    }
+    { "type": "text", "id": "privacy_url", "label": "Privacy Policy URL", "default": "/policies/privacy-policy" },
+    { "type": "text", "id": "privacy_link_text", "label": "Privacy Link Text", "default": "Learn more →" },
+    { "type": "text", "id": "accept_text", "label": "Accept All Text", "default": "Accept All" },
+    { "type": "text", "id": "decline_text", "label": "Decline Text", "default": "Decline" }
   ]
 }
 {% endschema %}
