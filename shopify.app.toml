@@ -22,7 +22,7 @@ api_version = "2026-04"
 
 [access_scopes]
 # Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
-scopes = "write_metaobject_definitions,write_metaobjects,write_products"
+scopes = "read_products,write_products,write_metaobject_definitions,write_metaobjects"
 
 [auth]
 redirect_urls = [ "https://example.com/api/auth" ]
@@ -33,6 +33,14 @@ name = "Demo Source Info"
 description = "Tracks products created by the Shopify app template for development"
 
   [product.metafields.app.demo_info.access]
+  admin = "merchant_read_write"
+
+[product.metafields.app.size_chart_id]
+type = "single_line_text_field"
+name = "Size Chart ID"
+description = "Links product to a size chart metaobject"
+
+  [product.metafields.app.size_chart_id.access]
   admin = "merchant_read_write"
 
 [metaobjects.app.example]
@@ -50,3 +58,20 @@ required = true
 [metaobjects.app.example.fields.description]
 name = "Description"
 type = "multi_line_text_field"
+
+[metaobjects.app.size_chart]
+name = "Size Chart"
+description = "Shoe size charts with US/EU/UK/CM measurements"
+
+  [metaobjects.app.size_chart.access]
+  admin = "merchant_read_write"
+
+[metaobjects.app.size_chart.fields.name]
+name = "Chart Name"
+type = "single_line_text_field"
+required = true
+
+[metaobjects.app.size_chart.fields.sizes]
+name = "Sizes"
+type = "multi_line_text_field"
+description = "JSON array of size mappings [{us, eu, uk, cm}]"
